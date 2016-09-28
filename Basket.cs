@@ -5,26 +5,25 @@ public class Basket
 {
 
     private static List<Fruits> fruitList = new List<Fruits>();
-    private static List<Fruits> fruitList1 = new List<Fruits>();
-    
-
+   
     public void AddFruit()
     {
-        for (int i=0; i<3; i++)
+        fruitList.Clear();
+        for (int a=0; a<3; a++)
         {
             Fruits apple = new Fruits("apple", "red", 300, 800);
             fruitList.Add(apple);
             
         }
 
-       for (int i=0; i<6; i++)
+       for (int b=0; b<6; b++)
         {
             Fruits lemon = new Fruits("lemon", "yellow", 100, 600);
             fruitList.Add(lemon);
             
         }
 
-       for (int i=0; i<3; i++)
+       for (int c=0; c<3; c++)
         {
             Fruits watermelon = new Fruits("watermelon", "green", 300, 1000);
             fruitList.Add(watermelon);
@@ -48,9 +47,11 @@ public class Basket
 
     public List<Fruits> GetFruitType(string name)
     {
-         fruitList1= fruitList;
+        List<Fruits> fruitList1 = new List<Fruits>(fruitList);
         fruitList1.RemoveAll(fruit => fruit.FruitName != name);
         return fruitList1;
     }
+
+   
 	
 }
