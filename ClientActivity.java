@@ -11,7 +11,6 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;
 import android.os.Build;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -65,75 +64,38 @@ public class ClientActivity extends AppCompatActivity {
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
         deletePersistentGroups();
         adapter = new ArrayAdapter<WifiP2pDevice>(this,android.R.layout.simple_list_item_1, deviceList);
-        listView = (ListView)findViewById(R.id.listView2);
+        ListView listView = (ListView)findViewById(R.id.listView2);
         listView.setAdapter(adapter);
-        /*
+
         //listView to show the peers list
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            }
-        });*/
-    }
+                WifiP2pConfig config = new WifiP2pConfig();
+                config.deviceAddress = deviceList.get(position).deviceAddress;
+                config.wps.setup = WpsInfo.PBC;
+                config.groupOwnerIntent = 0 ;
 
-    private void setFirstItem() {
+                //connecting
+                mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
 
-        Random rand = new Random();
-        //number = rand.nextInt((1 - 0) + 1) + 0;
-        number = rand.nextInt((listView.getAdapter().getCount()-1 - 0) + listView.getAdapter().getCount()-1) + 0;
-        System.out.println((listView.getAdapter().getCount()-1));
-        listView.setSelection(number);
-        il.onItemSelected(listView, listView.getChildAt(number), listView.getSelectedItemPosition(),
-                listView.getSelectedItemId());
-    }
-
-    private AdapterView.OnItemSelectedListener il = new AdapterView.OnItemSelectedListener() {
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            final WifiP2pConfig config = new WifiP2pConfig();
-            config.deviceAddress = deviceList.get(position).deviceAddress;
-            config.wps.setup = WpsInfo.PBC;
-            config.groupOwnerIntent = 0 ;
-            //Toast.makeText(MainActivity.this, " selected item position " + position, Toast.LENGTH_LONG).show();
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if(adapter!=null) {
-                        mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
-
-                            @Override
-                            public void onSuccess() {
-                                //clear the list
-                                deviceList.clear();
-                                adapter.notifyDataSetChanged();
-                            }
-
-                            @Override
-                            public void onFailure(int reason) {
-                                Toast.makeText(ClientActivity.this, "Connect failed. Retry.", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                    @Override
+                    public void onSuccess() {
+                        //clear the list
+                        deviceList.clear();
+                        adapter.notifyDataSetChanged();
                     }
-                    else
-                    {
+
+                    @Override
+                    public void onFailure(int reason) {
                         Toast.makeText(ClientActivity.this, "Connect failed. Retry.", Toast.LENGTH_SHORT).show();
                     }
-                }
-            }, 7000);
-
-
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-
-            // TODO Auto-generated method stub
-
-        }
-
-    };
+                });
+            }
+        });
+    }
 
     @Override
     public void onStart()
